@@ -1,0 +1,13 @@
+pandas
+sqlalchemy
+psycopg2-binary
+lxml
+xlsxwriter
+requests
+bs4
+selenium
+webdriver_manager
+anticaptchaofficial
+fasteners
+fastapi
+uvicorn

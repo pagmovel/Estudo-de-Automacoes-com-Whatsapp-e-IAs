@@ -1,0 +1,94 @@
+# version: '3.9'
+
+services:
+  postgres:
+    image: postgres:latest
+    container_name: postgres_base_container
+    environment:
+      POSTGRES_USER: "postgres"
+      POSTGRES_PASSWORD: "postgres"
+      POSTGRES_DB: "n8n"
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - postgres_network
+
+  portainer:
+    image: portainer/portainer-ce:latest
+    container_name: portainer_container
+    restart: always
+    ports:
+      - "127.0.0.1:9000:9000"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - portainer_data:/data
+    depends_on:
+      - postgres
+    networks:
+      - postgres_network
+      - automacao_network
+
+  redis:
+    image: redis:latest
+    container_name: redis_container
+    ports:
+      - "127.0.0.1:8105:6379"
+    networks:
+      - postgres_network
+      - automacao_network
+
+  evolution-api:
+    image: atendai/evolution-api:latest
+    container_name: evolution_api
+    restart: always
+    ports:
+      - "8104:8080"
+    environment:
+      AUTHENTICATION_API_KEY: "bXVkZS1tZQ=="
+      DATABASE_ENABLED: "true"
+      DATABASE_PROVIDER: "postgresql"
+      DATABASE_CONNECTION_URI: "postgresql://postgres:postgres@postgres_base_container:5432/evolution"
+      CACHE_REDIS_ENABLED: "true"
+      CACHE_REDIS_URI: "redis://redis_container:6379"
+    volumes:
+      - evolution_instances:/evolution/instances
+    depends_on:
+      - portainer
+      - redis
+    networks:
+      - postgres_network
+      - automacao_network
+
+  n8n:
+    image: n8nio/n8n:latest
+    container_name: n8n_container
+    environment:
+      - N8N_BASIC_AUTH_ACTIVE=true
+      - N8N_BASIC_AUTH_USER=usuario
+      - N8N_BASIC_AUTH_PASSWORD=senha
+      - DB_TYPE=postgresdb
+      - DB_POSTGRESDB_DATABASE=n8n
+      - DB_POSTGRESDB_HOST=postgres_base_container
+      - DB_POSTGRESDB_PORT=5432
+      - DB_POSTGRESDB_USER=postgres
+      - DB_POSTGRESDB_PASSWORD=postgres
+    ports:
+      - "127.0.0.1:8101:5678"
+    depends_on:
+      - postgres
+    networks:
+      - postgres_network
+      - automacao_network
+
+volumes:
+  postgres_data:
+  portainer_data:
+  evolution_instances:
+
+networks:
+  postgres_network:
+    name: postgres_network
+  automacao_network:
+    name: automacao_network

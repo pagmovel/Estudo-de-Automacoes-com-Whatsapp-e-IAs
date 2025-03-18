@@ -1,0 +1,28 @@
+version: '3.8'
+
+services:
+  ollama:
+    image: ollama-container
+    container_name: ollama_container
+    build:
+      context: .
+      dockerfile: Dockerfile
+    networks:
+      - web
+      - postgres_network
+    volumes:
+      - .:/app  # Monta o diretório atual no container
+    ports:
+      - "8103:5000"  # API Flask disponível na porta 8103
+    environment:
+      - OLLAMA_MAX_LOADED_MODELS=1
+      - ENV_VAR_NAME=value  # Adicione variáveis de ambiente, se necessário
+    stdin_open: true  # Mantém o terminal interativo
+    tty: true  # Permite interação no terminal
+
+networks:
+  web:
+    name: web
+    external: true  # Altere para false caso a rede "web" não exista previamente
+  postgres_network:
+    external: true

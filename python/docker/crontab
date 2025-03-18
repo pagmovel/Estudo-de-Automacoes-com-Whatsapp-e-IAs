@@ -1,0 +1,7 @@
+SHELL=/bin/bash
+PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+LANG=pt_BR.UTF-8
+LC_CTYPE=pt_BR.UTF-8
+
+
+# */10 * * * 1-5 cd /app && uvicorn api:app --reload >> /app/logs/api.log 2>&1

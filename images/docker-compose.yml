@@ -1,0 +1,23 @@
+version: '3'
+services:
+  n8n:
+    image: n8nio/n8n
+    container_name: n8n
+    ports:
+      - "8101:5678"
+    volumes:
+      - dados_compartilhados:/home/node/.n8n
+    environment:
+      - N8N_BASIC_AUTH_ACTIVE=true  # Habilita a autenticação básica
+      - N8N_BASIC_AUTH_USER=admin   # Define o nome de usuário
+      - N8N_BASIC_AUTH_PASSWORD=senha123  # Define a senha
+    networks:
+      - web
+
+volumes:
+  dados_compartilhados:
+    name: dados_compartilhados
+
+networks:
+  web:
+    external: true

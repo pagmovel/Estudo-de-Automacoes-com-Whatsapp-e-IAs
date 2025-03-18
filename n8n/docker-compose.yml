@@ -1,0 +1,26 @@
+services:
+  n8n:
+    image: n8nio/n8n:latest
+    container_name: n8n_container
+    environment:
+      - N8N_BASIC_AUTH_ACTIVE=true
+      - N8N_BASIC_AUTH_USER=usuario
+      - N8N_BASIC_AUTH_PASSWORD=senha
+      - DB_TYPE=postgresdb
+      - DB_POSTGRESDB_DATABASE=n8n
+      - DB_POSTGRESDB_HOST=postgres_container  # Nome do container do PostgreSQL existente
+      - DB_POSTGRESDB_PORT=5432
+      - DB_POSTGRESDB_USER=postgres
+      - DB_POSTGRESDB_PASSWORD=postgres
+    ports:
+      - "127.0.0.1:8101:5678"  # Expondo o n8n na porta 8101 do host
+    networks:
+      - web
+      - postgres_network
+
+networks:
+  web:
+    name: web
+    external: true
+  postgres_network:
+    external: true

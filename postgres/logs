@@ -1,0 +1,57 @@
+The files belonging to this database system will be owned by user "postgres".
+This user must also own the server process.
+
+The database cluster will be initialized with locale "en_US.utf8".
+The default database encoding has accordingly been set to "UTF8".
+The default text search configuration will be set to "english".
+
+Data page checksums are disabled.
+
+fixing permissions on existing directory /var/lib/postgresql/data ... ok
+creating subdirectories ... ok
+selecting dynamic shared memory implementation ... posix
+selecting default "max_connections" ... 100
+selecting default "shared_buffers" ... 128MB
+selecting default time zone ... Etc/UTC
+creating configuration files ... ok
+running bootstrap script ... ok
+performing post-bootstrap initialization ... ok
+syncing data to disk ... ok
+
+
+Success. You can now start the database server using:
+
+    pg_ctl -D /var/lib/postgresql/data -l logfile start
+
+waiting for server to start....2025-03-02 22:45:48.854 UTC [48] LOG:  starting PostgreSQL 17.4 (Debian 17.4-1.pgdg120+2) on x86_64-pc-linux-gnu, compiled by gcc (Debian 12.2.0-14) 12.2.0, 64-bit
+2025-03-02 22:45:48.857 UTC [48] LOG:  listening on Unix socket "/var/run/postgresql/.s.PGSQL.5432"
+2025-03-02 22:45:48.868 UTC [51] LOG:  database system was shut down at 2025-03-02 22:45:48 UTC
+2025-03-02 22:45:48.875 UTC [48] LOG:  database system is ready to accept connections
+ done
+server started
+CREATE DATABASE
+
+
+/usr/local/bin/docker-entrypoint.sh: running /docker-entrypoint-initdb.d/configure-auth.sh
+/var/run/postgresql:5432 - accepting connections
+waiting for server to shut down...2025-03-02 22:45:49.138 UTC [48] LOG:  received fast shutdown request
+.2025-03-02 22:45:49.141 UTC [48] LOG:  aborting any active transactions
+2025-03-02 22:45:49.144 UTC [48] LOG:  background worker "logical replication launcher" (PID 54) exited with exit code 1
+2025-03-02 22:45:49.144 UTC [49] LOG:  shutting down
+2025-03-02 22:45:49.147 UTC [49] LOG:  checkpoint starting: shutdown immediate
+2025-03-02 22:45:49.307 UTC [49] LOG:  checkpoint complete: wrote 921 buffers (5.6%); 0 WAL file(s) added, 0 removed, 0 recycled; write=0.040 s, sync=0.111 s, total=0.163 s; sync files=301, longest=0.010 s, average=0.001 s; distance=4238 kB, estimate=4238 kB; lsn=0/1908970, redo lsn=0/1908970
+2025-03-02 22:45:49.317 UTC [48] LOG:  database system is shut down
+ done
+server stopped
+waiting for server to start....2025-03-02 22:45:49.369 UTC [64] LOG:  starting PostgreSQL 17.4 (Debian 17.4-1.pgdg120+2) on x86_64-pc-linux-gnu, compiled by gcc (Debian 12.2.0-14) 12.2.0, 64-bit
+2025-03-02 22:45:49.372 UTC [64] LOG:  listening on Unix socket "/var/run/postgresql/.s.PGSQL.5432"
+2025-03-02 22:45:49.383 UTC [67] LOG:  database system was shut down at 2025-03-02 22:45:49 UTC
+2025-03-02 22:45:49.390 UTC [64] LOG:  database system is ready to accept connections
+ done
+server started
+
+/usr/local/bin/docker-entrypoint.sh: running /docker-entrypoint-initdb.d/init.sh
+
+/usr/local/bin/docker-entrypoint.sh: running /docker-entrypoint-initdb.d/init.sql
+2025-03-02 22:45:49.495 UTC [73] ERROR:  role "admin" already exists
+2025-03-02 22:45:49.495 UTC [73] STATEMENT:  CREATE USER admin WITH PASSWORD 'senha123';
