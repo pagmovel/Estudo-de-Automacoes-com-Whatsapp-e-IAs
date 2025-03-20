@@ -46,12 +46,17 @@ services:
     ports:
       - "8104:8080"
     environment:
+      # https://strpwdgen.pages.dev/   para gerar uma senha (antes de gerar, desmarque a caixinha "Include Special Symbols")
+      # versão do wsweb: 2.2509.4.0  / no video: 2.3000.1019967989 https://youtu.be/JNCwQrDt_oc?si=sAwhvMVGnV5f8kn1
+      # a url do webhoo tem que iniciar com http://host.docker.internal:8101/
       AUTHENTICATION_API_KEY: "bXVkZS1tZQ=="
       DATABASE_ENABLED: "true"
       DATABASE_PROVIDER: "postgresql"
       DATABASE_CONNECTION_URI: "postgresql://postgres:postgres@postgres_base_container:5432/evolution"
       CACHE_REDIS_ENABLED: "true"
       CACHE_REDIS_URI: "redis://redis_container:6379"
+      N8N_WEBHOOK_URL: "http://host.docker.internal:8101"
+
     volumes:
       - evolution_instances:/evolution/instances
     depends_on:
@@ -74,8 +79,12 @@ services:
       - DB_POSTGRESDB_PORT=5432
       - DB_POSTGRESDB_USER=postgres
       - DB_POSTGRESDB_PASSWORD=postgres
+      - WEBHOOK_URL=http://host.docker.internal:8101
+      # - N8N_ENDPOINT_WEBHOOK=http://n8n_container:5678
+      # - N8N_WEBHOOK_TUNNEL_URL=http://n8n_container:5678
+
     ports:
-      - "127.0.0.1:8101:5678"
+      - "8101:5678"
     depends_on:
       - postgres
     networks:
@@ -90,5 +99,6 @@ volumes:
 networks:
   postgres_network:
     name: postgres_network
+    external: true
   automacao_network:
     name: automacao_network
