@@ -1,23 +1,26 @@
+# db.py
+
 import os
 import json
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 
-# Define o caminho absoluto para o config.json
 BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 config_path = os.path.join(BASE_DIR, 'config.json')
 
-# Carrega as configurações do JSON
 with open(config_path, 'r') as f:
     config = json.load(f)
 
-# Obtém o ambiente atual do config.json (ex: 'dev' ou 'prod')
-ambiente = config.get("ambiente", "dev")  # Default para 'dev' se não estiver definido
-
-# Função para criar engine com base na configuração selecionada
-def get_engine(db_key):
-    db_params = config['database'][db_key]
+def get_engine():
+    """
+    Lê config["ambiente"] (ex.: 'dev', 'prod') e monta a conexão com base nisso.
+    """
+    ambiente = config.get("ambiente", "dev")  # Pega "ambiente" ou usa 'dev' como padrão
+    db_params = config['database'].get(ambiente)
+    
+    if not db_params:
+        raise ValueError(f"Ambiente '{ambiente}' não encontrado em config['database'].")
     
     if db_params['database'].lower() == 'pgsql':
         connection_string = (
@@ -25,11 +28,22 @@ def get_engine(db_key):
             f"@{db_params['host']}:{db_params['port']}/{db_params['dbname']}"
         )
     else:
+        # Fallback se não for pgsql
         connection_string = 'sqlite:///meu_banco.db'
     
     return create_engine(connection_string, echo=False)
 
-# Usa a configuração correta baseada no ambiente
-engine = get_engine(ambiente)
+def get_schema():
+    """
+    Retorna o schema definido no config.json para o ambiente atual.
+    """
+    ambiente = config.get("ambiente", "dev")
+    db_params = config['database'].get(ambiente)
+    if not db_params:
+        raise ValueError(f"Ambiente '{ambiente}' não encontrado em config['database'].")
+    return db_params.get('schema', None)
+
+# Inicializa engine e SessionLocal para uso geral
+engine = get_engine()
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 Base = declarative_base()

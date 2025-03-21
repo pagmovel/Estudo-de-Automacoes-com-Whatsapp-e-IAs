@@ -33,39 +33,43 @@ class QueryChain:
         self.query = query
         self.session = session
         self.model = model
+        # Se .select() não for chamado, fica None. Se for chamado, vira uma lista de colunas.
+        self._selected_columns = None
         
     
     
     def select(self, *columns):
         """
-        Especifica quais colunas devem ser retornadas na consulta.
-
         Pode ser usado com joins para selecionar colunas de múltiplas tabelas.
-
-        Exemplos:
-            - .select(Modelo.id, Modelo.nome)
-            - .select(OtraTabela.id, Modelo.nome)
-            - .select('id', 'nome')  # Passando strings
-
-        Quando usado com joins, certifique-se de referenciar corretamente a tabela.
+        Exemplo:
+        .select(Modelo.id, Modelo.nome, OutraTabela.coluna)
+        .select('id', 'nome')
         """
         selected_columns = []
-        
+        column_names = []
+
         for col in columns:
             if isinstance(col, str):
-                # Se a coluna for passada como string, tenta pegar do modelo principal
+                # Coluna referindo-se ao modelo principal
                 if hasattr(self.model, col):
                     selected_columns.append(getattr(self.model, col))
+                    column_names.append(col)
                 else:
                     raise AttributeError(f"A coluna '{col}' não existe no modelo {self.model.__name__}")
             else:
                 # Se for passado um atributo de outro modelo (usado em joins)
                 selected_columns.append(col)
+                # Tenta usar col.key como "nome" no dicionário final, ou fallback em str(col)
+                if hasattr(col, 'key') and col.key:
+                    column_names.append(col.key)
+                else:
+                    column_names.append(str(col))
 
         if not selected_columns:
-            raise ValueError("O método select() requer pelo menos uma coluna válida para seleção.")
+            raise ValueError("O método select() requer pelo menos uma coluna válida.")
 
         self.query = self.query.with_entities(*selected_columns)
+        self._selected_columns = column_names  # para uso no toDict
         return self
 
     
@@ -293,9 +297,35 @@ class QueryChain:
 
     def toDict(self):
         """
-        Executa a consulta e retorna os resultados como lista de dicionários.
+        Executa a consulta e retorna:
+          - Se NENHUMA coluna foi passada a select(), retorna [obj.to_dict(), ...].
+          - Se houve select('colA', 'colB'...), retorna uma lista de dicionários
+            montados com base nessas colunas selecionadas.
         """
-        return [item.to_dict() for item in self.toList()]
+        rows = self.toList()
+
+        # Caso não tenha sido chamado select(), assumimos que cada row é instância do model
+        if not self._selected_columns:
+            return [item.to_dict() for item in rows]
+
+        # Se houve select(...), então cada 'item' de rows é basicamente uma tupla
+        # se várias colunas, ou um valor "simples" se 1 coluna.
+        resultado = []
+        num_cols = len(self._selected_columns)
+
+        for item in rows:
+            # Se a query retorna só 1 coluna, 'item' não é tupla, é um valor
+            if num_cols == 1:
+                col_name = self._selected_columns[0]
+                d = {col_name: item}
+            else:
+                # Várias colunas => 'item' é uma tupla
+                d = {}
+                for i, col_name in enumerate(self._selected_columns):
+                    d[col_name] = item[i]
+            resultado.append(d)
+
+        return resultado
 
     def first(self):
         """

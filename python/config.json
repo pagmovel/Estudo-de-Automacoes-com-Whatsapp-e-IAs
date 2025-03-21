@@ -26,7 +26,8 @@
             "password": "nemaapau",
             "host": "192.168.1.22",
             "port": "5432",
-            "schema": "autokit"
+            "schema": "autokit",
+            "hash": "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"
         }
     },
     "ldap": {
