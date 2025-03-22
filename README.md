@@ -37,7 +37,7 @@ Caso ocorra algum erro na construção dos containers referente a banco de dados
 
 ### Instalando Node do Evolutio-API
 
-Mesmo adicionando o nó dentro de Settings->Community nodes->n8n-nodes-evolution-api, ele não aparecia na lista de nodes quando trentava buscar para criar a conexão.
+Mesmo adicionando o nó dentro de Settings->Community nodes->n8n-nodes-evolution-api, ele não aparecia na lista de nodes quando tentava buscar para criar a conexão.
 A solução foi instalar manualmente dentro do conteiner da seguinte forma:
 ```
 docker exec -it n8n_container sh
