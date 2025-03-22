@@ -33,3 +33,28 @@ Links de acesso:
   - PORT: 5432
 
 Caso ocorra algum erro na construção dos containers referente a banco de dados n8n/evolution-api, basta acessar o postgres, criá-lo(s) manualmente, e em segyidar executar novamente o comando docker-compose up -d --build.
+
+
+### Instalando Node do Evolutio-API
+
+Mesmo adicionando o nó dentro de Settings->Community nodes->n8n-nodes-evolution-api, ele não aparecia na lista de nodes quando trentava buscar para criar a conexão.
+A solução foi instalar manualmente dentro do conteiner da seguinte forma:
+```
+docker exec -it n8n_container sh
+cd /home/node/.n8n
+npm install n8n-nodes-evolution-api
+```
+No final da instalação vai ter algo parecido com estas linhas:
+```
++ n8n-nodes-evolution-api@x.y.z
+added x packages from y contributors
+```
+Saia do conteiner:
+```
+exit
+```
+Reinicie o container para que o n8n carregue o novo node:
+```
+docker restart n8n_container
+```
+
