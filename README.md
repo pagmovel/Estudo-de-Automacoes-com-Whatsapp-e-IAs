@@ -8,9 +8,9 @@ Ao executar
 docker-compose up -d --build
 ```
 
-Além de construir todos os conteiner de uma vez, ele também iniciará os serviços.
+Além de construir todos os container de uma vez, ele também iniciará os serviços.
 
-O Evolution-API vai instalar o REDIS em um outro conteiner.
+O Evolution-API vai instalar o REDIS em um outro container.
 Acessando o gerenciador pelo link http://localhost:8104/manager/login
 O gerenciador do Evolution-API vai solicitar um API Key Global\* na tela de autenticação.
 Este valor está na variavel AUTHENTICATION_API_KEY do docker-composer.yml na pasta evolution-api
@@ -37,8 +37,8 @@ Caso ocorra algum erro na construção dos containers referente a banco de dados
 
 ### Instalando Node do Evolutio-API
 
-Mesmo adicionando o nó dentro de Settings->Community nodes->n8n-nodes-evolution-api, ele não aparecia na lista de nodes quando tentava buscar para criar a conexão.
-A solução foi instalar manualmente dentro do conteiner da seguinte forma:
+Mesmo adicionando o node dentro de Settings->Community nodes->n8n-nodes-evolution-api, ele não aparecia na lista de nodes quando tentava buscar para criar a conexão.
+A solução foi instalar manualmente dentro do container da seguinte forma:
 ```
 docker exec -it n8n_container sh
 cd /home/node/.n8n
@@ -49,7 +49,7 @@ No final da instalação vai ter algo parecido com estas linhas:
 + n8n-nodes-evolution-api@x.y.z
 added x packages from y contributors
 ```
-Saia do conteiner:
+Saia do container:
 ```
 exit
 ```

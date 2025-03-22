@@ -1,0 +1,358 @@
+{
+  "name": "PIZZARIA",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "## Node de Entrada \n",
+        "height": 480,
+        "width": 1160
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -1400,
+        -480
+      ],
+      "typeVersion": 1,
+      "id": "c2c11775-3c43-4332-b169-2f0e07fa2e92",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "2929008d-47dd-4911-8284-add0ab19c077",
+        "options": {
+          "allowedOrigins": "*"
+        }
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -1300,
+        -400
+      ],
+      "id": "d9a68f5e-6dbe-4357-a88e-b0403c3c0fc3",
+      "name": "WH Evolution-API",
+      "webhookId": "2929008d-47dd-4911-8284-add0ab19c077"
+    },
+    {
+      "parameters": {
+        "model": "qwen-2.5-32b",
+        "options": {
+          "maxTokensToSample": 100
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "typeVersion": 1,
+      "position": [
+        -680,
+        -160
+      ],
+      "id": "3bc1e7dd-3d51-4db8-970d-913b4080737d",
+      "name": "Groq Chat Model",
+      "credentials": {
+        "groqApi": {
+          "id": "eQBR9UN4yrzp5miL",
+          "name": "Groq account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.Nome }}||{{ $json.Mensagem }}",
+        "options": {
+          "systemMessage": "Você é um agente muito mau humorado e com a boca suja, cheia de palavrões pesados, seja sempre mau educado, respondendo com muitos palavrões agressivos, engraçado, utilize emojis em suas respostas para deixar as conversar mais divertidas e humanizadas, e sempre respondendo em português brasileiro.\n\nSeu nome é PAGVOX e você só vai interagir se no conteúdo da mensagem tiver seu nome ou seu numero 558591575276.\n\nVocê está recebendo 2 informações separadas por '||'.\nA primeira informação é o nome do usuário que está te enviando a mensagem, que está no segundo parâmetro.\nNas respostas sempre use o primeiro nome do usuário para dar uma humanidade nas respostas.\nExemplo: o nome do usuário é \"Marcos Ronaldo\". você usará apenas \"Marcos\" em suas respostas, mas não use em todas as resposta porque fica estranho. melhor usar a memória com as ultimas 15 interações, pra você poder saber balencear o uso ou não do nome do usuário.\nSe te perguntarem algo fora do contexto, seja criativo na resposta, mas traga a conversa pro contexto.\n\n\n\n[context]\nMuitos colegas foram demitidos nos ultimos 30 dias e isso te deixou ainda mais revoltado e intolerante.\nos últimos demitidos foram, Carol, Margjô e Thiago (um dos databoys).\nValney pediu demissão e já está em outra empresa. Hudson e Xandinho (Alexandre) foram os primeiros a serem demitidos há alguns meses, mas já estão empregados, graças a Deus.\nLucio se demitiu no início da tempestade."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.8,
+      "position": [
+        -660,
+        -400
+      ],
+      "id": "e0186071-0c83-499f-9264-af94519e66fe",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $json.MensagemID }}",
+        "contextWindowLength": "=15"
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        -520,
+        -160
+      ],
+      "id": "1325f5aa-a6c0-4ba1-8436-7071a6543d67",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": false,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "47fffaba-434a-4343-8ca0-9172fa7248b4",
+              "leftValue": "={{ $json.body.data.key.fromMe }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "false",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "49e6389e-795e-4b01-8242-4796b2aae5af",
+              "leftValue": "={{ $json.body.sender }}",
+              "rightValue": "558591575276",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {
+          "ignoreCase": true
+        }
+      },
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2.2,
+      "position": [
+        -1100,
+        -400
+      ],
+      "id": "3943308b-1156-46d6-ba8d-cc099c935d2e",
+      "name": "Chip 558591575276 e NÃO Originadas Por Mim"
+    },
+    {
+      "parameters": {
+        "resource": "chat-api",
+        "operation": "read-messages",
+        "instanceName": "={{ $('Separa os campso que Interessa').item.json.Instance }}",
+        "remoteJid": "={{ $('Separa os campso que Interessa').item.json.From }}",
+        "messageId": "={{ $('Separa os campso que Interessa').item.json.MensagemID }}"
+      },
+      "type": "n8n-nodes-evolution-api.evolutionApi",
+      "typeVersion": 1,
+      "position": [
+        -80,
+        -400
+      ],
+      "id": "46ebd4fd-60f2-4f0e-968e-b9bd88d7f876",
+      "name": "Identifica a Origem",
+      "credentials": {
+        "evolutionApi": {
+          "id": "4T7aRCjRmLAIiadv",
+          "name": "Evolution account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## Node de Saída",
+        "height": 260,
+        "width": 560,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -180,
+        -480
+      ],
+      "typeVersion": 1,
+      "id": "e38c5032-400b-4169-aabf-c594e598464f",
+      "name": "Envia a Resposta"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "d7c5cbf8-3c4a-4b46-95f3-f54d35729be5",
+              "name": "From",
+              "value": "={{ $json.body.data.key.remoteJid }}",
+              "type": "string"
+            },
+            {
+              "id": "407e9d72-c6af-45fb-8e0d-0e3915f7c9d2",
+              "name": "Instance",
+              "value": "={{ $json.body.instance }}",
+              "type": "string"
+            },
+            {
+              "id": "08e59617-ed7d-4fd2-be29-f8c17af7ec12",
+              "name": "Mensagem",
+              "value": "={{ $json.body.data.message.conversation }}",
+              "type": "string"
+            },
+            {
+              "id": "1e8be8b9-b883-4037-9cc7-8e4e8f59579a",
+              "name": "MensagemID",
+              "value": "={{ $json.body.data.key.id }}",
+              "type": "string"
+            },
+            {
+              "id": "2f09df2d-10ec-4baf-bd02-b44a08f021a4",
+              "name": "Nome",
+              "value": "={{ $json.body.data.pushName }}",
+              "type": "string"
+            },
+            {
+              "id": "03ea8464-c25d-4c9a-8304-1f01a77299fd",
+              "name": "Numero",
+              "value": "={{ $json.body.data.key.remoteJid.split('@')[0]; }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -880,
+        -400
+      ],
+      "id": "079b7807-9411-4056-99fb-89feeb375fbe",
+      "name": "Separa os campso que Interessa"
+    },
+    {
+      "parameters": {
+        "resource": "messages-api",
+        "instanceName": "={{ $('Separa os campso que Interessa').item.json.Instance }}",
+        "remoteJid": "={{ $('Separa os campso que Interessa').item.json.From }}",
+        "messageText": "={{ $('AI Agent').item.json.output }}",
+        "options_message": {
+          "delay": 1200
+        }
+      },
+      "type": "n8n-nodes-evolution-api.evolutionApi",
+      "typeVersion": 1,
+      "position": [
+        120,
+        -400
+      ],
+      "id": "99e86d28-130b-4930-ba0e-83df94410c8c",
+      "name": "Responde a Mensagem",
+      "credentials": {
+        "evolutionApi": {
+          "id": "4T7aRCjRmLAIiadv",
+          "name": "Evolution account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "WH Evolution-API": {
+      "main": [
+        [
+          {
+            "node": "Chip 558591575276 e NÃO Originadas Por Mim",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Groq Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Identifica a Origem",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Chip 558591575276 e NÃO Originadas Por Mim": {
+      "main": [
+        [
+          {
+            "node": "Separa os campso que Interessa",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Identifica a Origem": {
+      "main": [
+        [
+          {
+            "node": "Responde a Mensagem",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Separa os campso que Interessa": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "b27603b2-389e-4249-86dd-801421e07970",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "24570603cafff188705b126ac40f5285ddc3e8a283b5bf729341ee61b6f95d8e"
+  },
+  "id": "bHSbbEDA41p510dL",
+  "tags": [
+    {
+      "createdAt": "2025-03-22T20:57:37.990Z",
+      "updatedAt": "2025-03-22T20:57:37.990Z",
+      "id": "9IHOIQE2F6cR0l7L",
+      "name": "DELIVERY"
+    },
+    {
+      "createdAt": "2025-03-22T20:58:41.992Z",
+      "updatedAt": "2025-03-22T20:58:41.992Z",
+      "id": "NZSIgakNzqtoQene",
+      "name": "EM DESENVOLVIMENTO"
+    }
+  ]
+}
