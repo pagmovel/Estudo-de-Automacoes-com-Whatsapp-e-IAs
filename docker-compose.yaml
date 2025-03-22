@@ -46,7 +46,7 @@ services:
     ports:
       - "8104:8080"
     environment:
-      # https://strpwdgen.pages.dev/   para gerar uma senha (antes de gerar, desmarque a caixinha "Include Special Symbols")
+      # https://strpwdgen.pages.dev/   para gerar uma senha (antes de gerar, desmarque a caixinha "Include Special Symbols", e limite o tamanho para 30 caracteres)
       # versão do wsweb: 2.2509.4.0  / no video: 2.3000.1019967989 https://youtu.be/JNCwQrDt_oc?si=sAwhvMVGnV5f8kn1
       # a url do webhoo tem que iniciar com http://host.docker.internal:8101/
       AUTHENTICATION_API_KEY: "bXVkZS1tZQ=="
@@ -56,6 +56,7 @@ services:
       CACHE_REDIS_ENABLED: "true"
       CACHE_REDIS_URI: "redis://redis_container:6379"
       N8N_WEBHOOK_URL: "http://host.docker.internal:8101"
+      # CONFIG_SESSION_PHONE_VERSION=versão atual do WPP WEB
 
     volumes:
       - evolution_instances:/evolution/instances
@@ -82,6 +83,9 @@ services:
       - WEBHOOK_URL=http://host.docker.internal:8101
       # - N8N_ENDPOINT_WEBHOOK=http://n8n_container:5678
       # - N8N_WEBHOOK_TUNNEL_URL=http://n8n_container:5678
+      - GENERIC_TIMEZONE=America/Sao_Paulo
+      # - N8N_HOST=SUBDOMINIO.DOMINIO_COMPRADO
+      - N8N_COMMUNITY_PACKAGES_ENABLED=true
 
     ports:
       - "8101:5678"
