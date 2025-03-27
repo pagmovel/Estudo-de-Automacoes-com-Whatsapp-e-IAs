@@ -1,8 +1,21 @@
-# version: '3.9'
+# version: '3.8'
 
 services:
+  # postgres:
+  #   image: postgres:latest
+  #   container_name: postgres_base_container
+  #   environment:
+  #     POSTGRES_USER: "postgres"
+  #     POSTGRES_PASSWORD: "postgres"
+  #     POSTGRES_DB: "n8n"
+  #   ports:
+  #     - "5432:5432"
+  #   volumes:
+  #     - postgres_data:/var/lib/postgresql/data
+  #   networks:
+  #     - postgres_network
   postgres:
-    image: postgres:latest
+    image: pgvector/pgvector:pg16
     container_name: postgres_base_container
     environment:
       POSTGRES_USER: "postgres"
@@ -14,6 +27,7 @@ services:
       - postgres_data:/var/lib/postgresql/data
     networks:
       - postgres_network
+
 
   portainer:
     image: portainer/portainer-ce:latest
@@ -86,6 +100,7 @@ services:
       - GENERIC_TIMEZONE=America/Sao_Paulo
       # - N8N_HOST=SUBDOMINIO.DOMINIO_COMPRADO
       - N8N_COMMUNITY_PACKAGES_ENABLED=true
+      # - HASH=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
 
     ports:
       - "8101:5678"
