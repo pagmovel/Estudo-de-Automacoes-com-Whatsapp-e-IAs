@@ -1,0 +1,156 @@
+{
+  "name": "My workflow",
+  "nodes": [
+    {
+      "parameters": {
+        "modelName": "models/text-embedding-004"
+      },
+      "type": "@n8n/n8n-nodes-langchain.embeddingsGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        -340,
+        60
+      ],
+      "id": "afdc240b-8d3b-4f80-8f99-51c5b239beaf",
+      "name": "Embeddings Google Gemini",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "qoR7n3pQktrejkvJ",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "d02bc081-c5e0-42e4-810a-b64c57ef6df5",
+        "options": {
+          "allowedOrigins": "*"
+        }
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -500,
+        -120
+      ],
+      "id": "5ab6927a-0d9a-48be-9e19-194aca46bc7a",
+      "name": "Webhook",
+      "webhookId": "d02bc081-c5e0-42e4-810a-b64c57ef6df5"
+    },
+    {
+      "parameters": {
+        "chunkSize": 500,
+        "options": {
+          "splitCode": "markdown"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.textSplitterRecursiveCharacterTextSplitter",
+      "typeVersion": 1,
+      "position": [
+        -200,
+        220
+      ],
+      "id": "5ba56680-f6c6-4dd8-9bfd-4cfcd619b38b",
+      "name": "Recursive Character Text Splitter"
+    },
+    {
+      "parameters": {
+        "dataType": "binary",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.documentDefaultDataLoader",
+      "typeVersion": 1,
+      "position": [
+        -200,
+        80
+      ],
+      "id": "be964611-1d1d-433f-8a15-9611fd5c9abd",
+      "name": "Default Data Loader"
+    },
+    {
+      "parameters": {
+        "mode": "insert",
+        "options": {
+          "collection": {
+            "values": {
+              "useCollection": true
+            }
+          }
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStorePGVector",
+      "typeVersion": 1,
+      "position": [
+        -260,
+        -120
+      ],
+      "id": "d2651358-e861-471f-855d-8e5ddbd2de86",
+      "name": "Postgres PGVector Store",
+      "credentials": {
+        "postgres": {
+          "id": "7jx0a9AVxfL5seaP",
+          "name": "Postgres account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Embeddings Google Gemini": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Postgres PGVector Store",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Postgres PGVector Store",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Recursive Character Text Splitter": {
+      "ai_textSplitter": [
+        [
+          {
+            "node": "Default Data Loader",
+            "type": "ai_textSplitter",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Default Data Loader": {
+      "ai_document": [
+        [
+          {
+            "node": "Postgres PGVector Store",
+            "type": "ai_document",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "c777ab11-6720-429b-8e8e-b9d01298527a",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "27451c3bfebc18e4b7c5b2c807b33e2c647669478d653cfb5ec370986fae2b35"
+  },
+  "id": "fkZQAfkh6x2QvqDk",
+  "tags": []
+}
